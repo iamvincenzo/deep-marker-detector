@@ -1,62 +1,70 @@
 import os
 import math
-import torch
 import random
-import glob as glob
 from PIL import Image
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 
-def get_dataset(args):
+""" Function used to generate a proportioned dataset: 70% training and 
+    30% validation per each class. """
+def get_dataset(dataset_path, th, random_seed):
     pass
+    # return img_files_train, mask_files_train, img_files_valid, mask_files_valid
 
-""" Custom class used to create the training, validation and test sets. """
-class CustomDataset(Dataset):    
+
+""" Custom class used to create the training and test sets. """
+class CustomDataset(Dataset):
     """ Initialize configurations. """
-    def __init__(self, image_paths, args, normalize=None, train=True):
-        super().__init__()
+    def __init__(self, image_paths, target_paths, args, normalize=None, train=True):
+        self.image_paths = image_paths
+        self.target_paths = target_paths
         self.args = args
         self.train = train
-        self.image_paths = image_paths
         self.normalize = normalize
 
-    """ Method used to apply transformation to images. """
-    def transform(self, image):
-        # transformation applied only if required and only to training images
+    """ Method used to apply transformation to images 
+        and their corresponding masks."""
+    def transform(self, image, mask):
+         # transformation applied only if required and only to training images
         if self.args.apply_transformations and self.train:
-            # random horizontal flipping
+            # random horizontal flipping (we apply transforms here because we need to apply
+            # them with the same probability to both img and mask)
             if random.random() > 0.5:
                 image = TF.hflip(image)
+                mask = TF.hflip(mask)
             # random vertical flip
             if random.random() > 0.3:
                 image = TF.vflip(image)
+                mask = TF.vflip(mask)
             # random rotation
             if random.random() > 0.4:
                 angle = random.randint(-30, 30)
                 image = TF.rotate(image, angle)
+                mask = TF.rotate(mask, angle)
 
         # to tensor and remove the alpha channel if present (PNG format)
-        transform = transforms.Compose([transforms.ToTensor(),
-                                        transforms.Lambda(lambda x: x[:3])])
-        image = transform(image)
+        trnsf = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Lambda(lambda x: x[:3])])
+        image = trnsf(image)
+        mask = trnsf(mask)
 
         # input normalization if required
         if self.normalize is not None:
             image = self.normalize(image)
 
-        return image
+        return image, mask
 
-    """ Method used to get (image, label). """
+    """ Method used to get (image, mask, label). """
     def __getitem__(self, index):
-        # image_paths = (path, label)
+        # image_paths = tuple(path, label), target_paths = string(path)
         image_path = self.image_paths[index][0]
         label = self.image_paths[index][1]
         image = Image.open(image_path)
-        x = self.transform(image)
+        mask = Image.open(self.target_paths[index])
+        x, y = self.transform(image, mask)
 
-        return x, label
+        return x, y, label
 
-    """ Method used to get the dataset lenght. """
     def __len__(self):
         return len(self.image_paths)
