@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 from glob import glob
@@ -68,13 +69,22 @@ class AugmentData(object):
         mask_files_train_aug_list = [fn for fn in files if 'aug' in fn]
         img_files_train_aug_list = []
         
-        # insert the aumented images inside 'img_files_train_aug_list' using the
-        # format used in 'dataloader_utils.py': 
-        # (os.path.join(dataset_path, c, "image", e), i) 
-        # = ('./data/EBHI-SEG/Normal\\image\\GT2016907-1-400-001.png', 0)
-        for i, clss_name in enumerate(classes, 0): 
-            img_files_train_aug_list += [(file_name.replace('label', 'image'), i) 
-                                         for file_name in mask_files_train_aug_list 
-                                         if clss_name in file_name]
+        # # insert the aumented images inside 'img_files_train_aug_list' using the
+        # # format used in 'dataloader_utils.py': 
+        # # (os.path.join(dataset_path, c, "image", e), i) 
+        # # = ('./data/EBHI-SEG/Normal\\image\\GT2016907-1-400-001.png', 0)
+        # for i, clss_name in enumerate(classes, 0): 
+        #     img_files_train_aug_list += [(file_name.replace('label', 'image'), i) 
+        #                                  for file_name in mask_files_train_aug_list 
+        #                                  if clss_name in file_name]
         
         return img_files_train_aug_list, mask_files_train_aug_list
+    
+    """ Helper function used to remove augmented images:
+    (images, masks) generated with 'data_augmentation.py'. """
+    def remove_aug(self):
+        file_aug_list = [fn for fn in glob(
+            self.args.dataset_path + "*/*/*") if "aug" in fn]
+
+        for filename in file_aug_list:
+            os.remove(filename)
