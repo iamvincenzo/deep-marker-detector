@@ -42,6 +42,11 @@ def get_args():
 
     # network-architecture-parameters
     #######################################################################################
+    # num of filters in each convolutional layer (num of channels of the feature-map): 
+    # so you can modify the network architecture
+    parser.add_argument('--features', nargs='+',  default=[64, 128, 256, 512],
+                        help='a list of feature values (number of filters i.e., neurons in each layer)')
+    
     parser.add_argument("--use_batch_norm", action="store_true",
                         help="indicates whether to use batch normalization layers in each conv layer")
 

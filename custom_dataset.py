@@ -37,11 +37,11 @@ class CustomDataset(Dataset):
             if random.random() > 0.3:
                 image = TF.vflip(image)
                 mask = TF.vflip(mask)
-            # random rotation
-            if random.random() > 0.4:
-                angle = random.randint(-30, 30)
-                image = TF.rotate(image, angle)
-                mask = TF.rotate(mask, angle)
+            # # random rotation
+            # if random.random() > 0.4:
+            #     angle = random.randint(-30, 30)
+            #     image = TF.rotate(image, angle)
+            #     mask = TF.rotate(mask, angle)
 
         # to tensor and remove the alpha channel if present (PNG format)
         trnsf = transforms.Compose([transforms.ToTensor(),
@@ -55,16 +55,15 @@ class CustomDataset(Dataset):
 
         return image, mask
 
-    """ Method used to get (image, mask, label). """
+    """ Method used to get (image, mask). """
     def __getitem__(self, index):
-        # image_paths = tuple(path, label), target_paths = string(path)
-        image_path = self.image_paths[index][0]
-        label = self.image_paths[index][1]
+        image_path = self.image_paths[index]
         image = Image.open(image_path)
-        mask = Image.open(self.target_paths[index])
+        mask_path = self.target_paths[index]
+        mask = Image.open(mask_path)
         x, y = self.transform(image, mask)
 
-        return x, y, label
+        return x, y
 
     def __len__(self):
         return len(self.image_paths)

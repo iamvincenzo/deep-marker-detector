@@ -31,7 +31,7 @@ class Solver(object):
 
         self.model = model.to(device)
        
-        self.criterion = nn.MSELoss()
+        self.criterion = nn.BCEWithLogitsLoss()
 
         if self.args.opt == "SGD":
             self.optimizer = optim.SGD(self.model.parameters(), lr=self.args.lr, 
@@ -101,7 +101,7 @@ class Solver(object):
                 images, targets = images.to(self.device), targets.to(self.device)
 
                 # clear the gradients of all optimized variables   
-                self.optimizer.zero_grad() 
+                self.optimizer.zero_grad()
                 
                 # forward pass: compute predicted outputs by passing inputs to the model
                 outputs = self.model(images)
