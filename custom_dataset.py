@@ -1,17 +1,40 @@
 import os
-import math
 import random
 from PIL import Image
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 
-""" Function used to generate a proportioned dataset: 70% training and 
-    30% validation per each class. """
-def get_dataset(dataset_path, th, random_seed):
-    pass
-    # return img_files_train, mask_files_train, img_files_valid, mask_files_valid
+""" Function used to generate a proportioned dataset: 70% training and 30% validation. """
+def get_dataset(dataset_path, random_seed):
+    random.seed(random_seed)
 
+    img_files_train = []
+    mask_files_train = []   
+    img_files_valid = [] 
+    mask_files_valid = []
+        
+    split_percentage = 0.7
+    
+    image_paths = os.listdir(os.path.join(dataset_path, "images"))
+
+    # randomly select elements for train and validation sets
+    train_elements = random.sample(image_paths, int(len(image_paths) * split_percentage))
+    test_elements = list(set(image_paths) - set(train_elements))
+
+    img_files_train += [os.path.join(dataset_path, "images", elem) for elem in train_elements]
+    img_files_valid += [os.path.join(dataset_path, "images", elem) for elem in test_elements]
+
+    mask_files_train = [file.replace("images", "masks") for file in img_files_train]
+    mask_files_valid = [file.replace("images", "masks") for file in img_files_valid]
+
+    print(f'Number of elements in img_files_train: {len(img_files_train)}')
+    print(f'Number of elements in img_files_valid: {len(img_files_valid)}')
+
+    # # debug: check for duplicates
+    # print(f"\nCheck duplicates in train/test set: {list(set(img_files_train).intersection(img_files_valid))}\n")
+
+    return img_files_train, mask_files_train, img_files_valid, mask_files_valid
 
 """ Custom class used to create the training and test sets. """
 class CustomDataset(Dataset):

@@ -145,8 +145,10 @@ def main(args):
     writer = SummaryWriter("./runs/" + args.run_name + date)
     
     # custom dataset
-    img_files_train, img_files_valid = get_dataset()
-
+    (img_files_train, mask_files_train, 
+     img_files_valid, mask_files_valid) = get_dataset(dataset_path=args.dataset_path, 
+                                                      random_seed=args.random_seed)
+    
     if args.norm_input:
         # compute mean and std of unormalized data
         dataset = CustomDataset(img_files_train, args, normalize=None, train=True)
@@ -156,8 +158,8 @@ def main(args):
     else:
         normalize, mean, std = None, None, None
 
-    train_dataset = CustomDataset(img_files_train, args, normalize=normalize, train=True)
-    valid_dataset = CustomDataset(img_files_valid, args, normalize=normalize, train=False)
+    train_dataset = CustomDataset(img_files_train, mask_files_train, args, normalize=normalize, train=True)
+    valid_dataset = CustomDataset(img_files_valid, mask_files_valid, args, normalize=normalize, train=False)
 
     # pin_memory: speed up the host (cpu) to device (gpu) transfer
     pin = True if torch.cuda.is_available() else False
