@@ -219,9 +219,40 @@ class AutoEncoder(nn.Module):
 
         return x
     
-if __name__ == "__main__":
-    x = torch.rand((1, 1, 1080, 1920))
 
-    model = AutoEncoder(input_size=x.size(1), hidden_dim=8, weights_init=True)
+class ConvAutoencoder(torch.nn.Module):
+    def __init__(self):
+        super(ConvAutoencoder, self).__init__()
 
-    out = model(x)
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Conv2d(in_channels=1, out_channels=64, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=2, stride=1),
+            torch.nn.Conv2d(in_channels=64, out_channels=16, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(2, stride=1)
+        )
+
+        self.decoder = torch.nn.Sequential(
+            torch.nn.Upsample(scale_factor=1, mode="nearest"),
+            torch.nn.Conv2d(in_channels=16, out_channels=64, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.Upsample(scale_factor=1, mode="nearest"),
+            torch.nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=2),
+            torch.nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        x = self.encoder(x)
+        x = self.decoder(x)
+
+        return x
+
+# if __name__ == "__main__":
+#     x = torch.rand((1, 1, 1080, 1920))
+
+#     model = ConvAutoencoder()
+
+#     out = model(x)
+
+#     print(out.shape)
