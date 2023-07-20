@@ -150,7 +150,7 @@ def main(args):
     (img_files_train, mask_files_train, 
      img_files_valid, mask_files_valid) = get_dataset(dataset_path=args.dataset_path, 
                                                       random_seed=args.random_seed)
-        
+    
     if args.norm_input:
         # compute mean and std of unormalized data
         dataset = CustomDataset(img_files_train, args, normalize=None, train=True)
