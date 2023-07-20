@@ -170,7 +170,7 @@ class UNET(nn.Module):
     
 
 class AutoEncoder(nn.Module):
-    def __init__(self, in_channels, hidden_dim, weights_init=True):
+    def __init__(self, in_channels, hidden_dim):
         super(AutoEncoder, self).__init__()
         self.encoder = nn.Sequential(
             nn.Conv2d(in_channels=in_channels, out_channels=8 * hidden_dim, kernel_size=4, padding=1, stride=2, bias=False),
@@ -248,11 +248,3 @@ class ConvAutoencoder(torch.nn.Module):
 
         return x
 
-# if __name__ == "__main__":
-#     x = torch.rand((1, 1, 1080, 1920))
-
-#     model = ConvAutoencoder()
-
-#     out = model(x)
-
-#     print(out.shape)

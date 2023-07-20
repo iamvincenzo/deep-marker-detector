@@ -11,8 +11,10 @@ import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter
 
 from solver import Solver
-from custom_dataset import CustomDataset
+from models import AutoEncoder
+from models import ConvAutoencoder
 from custom_dataset import get_dataset
+from custom_dataset import CustomDataset
 
 
 """ Helper function used to get cmd parameters. """
@@ -30,8 +32,8 @@ def get_args():
 
     # model-types
     #######################################################################################
-    parser.add_argument("--select_model", type=str, default="YOLO",
-                        choices=["UNet", "YOLO", "AutoEncoder"], help="select the model to train")
+    parser.add_argument("--select_model", type=str, default="ConvAutoEncoder",
+                        choices=["UNet", "YOLO", "ConvAutoEncoder"], help="select the model to train")
 
     parser.add_argument("--pretrained", action="store_true",
                         help="indicates whether to load a pretrained model")
@@ -148,7 +150,7 @@ def main(args):
     (img_files_train, mask_files_train, 
      img_files_valid, mask_files_valid) = get_dataset(dataset_path=args.dataset_path, 
                                                       random_seed=args.random_seed)
-    
+        
     if args.norm_input:
         # compute mean and std of unormalized data
         dataset = CustomDataset(img_files_train, args, normalize=None, train=True)
@@ -168,7 +170,7 @@ def main(args):
     # according to a specific batch-size (load the data in memory)
     trainloader = DataLoader(train_dataset, batch_size=args.batch_size, 
                              shuffle=True, num_workers=args.workers, pin_memory=pin) 
-    validloader = DataLoader(valid_dataset, batch_size=args.batch_size,
+    validloader = DataLoader(valid_dataset, batch_size=1,
                              shuffle=True, num_workers=args.workers, pin_memory=pin)
 
     # # cuDNN supports many algorithms to compute convolution:
@@ -181,12 +183,11 @@ def main(args):
 
     # get input shape
     inputs, _ = next(iter(trainloader))
-    input_size = inputs.shape[1:]
-    # get output shape 
-    num_classes = args.num_classes
 
     # get the model
-    model = model_selection(args=args, input_size=input_size, num_classes=num_classes)
+    # model = ConvAutoencoder()
+    model = AutoEncoder(1, 2)
+    # model = model_selection(args=args, input_size=input_size, num_classes=num_classes)
 
     print("\nModel: ")
     pms.summary(model, torch.zeros(inputs.shape), max_depth=5, print_summary=True)

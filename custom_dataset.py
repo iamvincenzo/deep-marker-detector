@@ -28,7 +28,7 @@ def get_dataset(dataset_path, random_seed):
     mask_files_train = [file.replace("images", "masks") for file in img_files_train]
     mask_files_valid = [file.replace("images", "masks") for file in img_files_valid]
 
-    print(f'Number of elements in img_files_train: {len(img_files_train)}')
+    print(f'\nNumber of elements in img_files_train: {len(img_files_train)}')
     print(f'Number of elements in img_files_valid: {len(img_files_valid)}')
 
     # # debug: check for duplicates

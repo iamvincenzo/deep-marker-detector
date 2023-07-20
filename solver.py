@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from torch.optim.lr_scheduler import StepLR
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
+from plotting_utils import plot_imgs
 from pytorchtools import EarlyStopping
 from plotting_utils import plot_grad_flow
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -16,13 +17,12 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 """ Solver for training, validation and testing. """
 class Solver(object):
     """ Initialize configurations. """
-    def __init__(self, train_loader, valid_loader, test_loader, model, device, writer, normalize, args): 
+    def __init__(self, train_loader, valid_loader, model, device, writer, normalize, args): 
         self.args = args
         self.model_name = f"{self.args.model_name}_model.pt"
         self.num_epochs = self.args.num_epochs
         self.train_loader = train_loader
         self.valid_loader = valid_loader
-        self.test_loader = test_loader
         self.patience = self.args.patience
         self.writer = writer
         self.device = device
@@ -75,8 +75,8 @@ class Solver(object):
         avg_train_losses = []
         avg_valid_losses = []
 
-        # define the figure where to plot grads info
-        grads_fig = plt.figure(figsize=(12, 6))
+        # # define the figure where to plot grads info
+        # grads_fig = plt.figure(figsize=(12, 6))
 
         # initialize the early_stopping object
         check_path = os.path.join(self.args.checkpoint_path, self.model_name)
@@ -115,8 +115,8 @@ class Solver(object):
                 # # gradient clipping to avoid exploding gradients
                 # torch.nn.utils.clip_grad_norm_(parameters=self.model.parameters(), max_norm=1.0)
 
-                # plots the gradients flowing through different layers in the net during training
-                plot_grad_flow(self.model.named_parameters())
+                # # plots the gradients flowing through different layers in the net during training
+                # plot_grad_flow(self.model.named_parameters())
                 
                 # perform a single optimization step (parameter update)
                 self.optimizer.step()
@@ -197,8 +197,7 @@ class Solver(object):
 
                 valid_losses.append(loss.item())
 
-                # total_predictions.append(outputs)
-                # total_targets.append(targets)
+                plot_imgs(images[0], outputs[0])
                 
         # reput model into training mode
         self.model.train()
