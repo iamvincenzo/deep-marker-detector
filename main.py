@@ -77,7 +77,7 @@ def get_args():
                         help="the learning rate for optimization")
 
     parser.add_argument("--loss", type=str, default="mse",
-                        choices=["mse"],
+                        choices=["mse", "bcewll", "jac_loss", "dc_loss"],
                         help="the loss function used for model optimization")
 
     parser.add_argument("--opt", type=str, default="Adam", 

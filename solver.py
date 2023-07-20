@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from torch.optim.lr_scheduler import StepLR
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 
+from metrics import dc_loss
+from metrics import jac_loss
 from plotting_utils import plot_imgs
 from pytorchtools import EarlyStopping
 from plotting_utils import plot_grad_flow
@@ -31,7 +33,9 @@ class Solver(object):
 
         self.model = model.to(device)
        
-        self.criterion = nn.BCEWithLogitsLoss()
+        # self.criterion = nn.BCEWithLogitsLoss()
+        # self.criterion = dc_loss
+        self.criterion = jac_loss
 
         if self.args.opt == "SGD":
             self.optimizer = optim.SGD(self.model.parameters(), lr=self.args.lr, 

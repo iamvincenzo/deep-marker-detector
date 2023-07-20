@@ -36,7 +36,7 @@ def plot_imgs(images, outputs, block=False):
     axes[0].set_title("Original")
     axes[1].imshow(recon_img, cmap="gray")
     axes[1].axis("off")
-    axes[1].set_title("Reconstructed")
+    axes[1].set_title("Prediction mask")
     plt.tight_layout()
     
     if(block): 
