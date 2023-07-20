@@ -23,10 +23,10 @@ def get_args():
 
     # model-infos
     #######################################################################################
-    parser.add_argument("--run_name", type=str, default="run_1",
+    parser.add_argument("--run_name", type=str, default="ConvAE",
                         help="the name assigned to the current run")
 
-    parser.add_argument("--model_name", type=str, default="unet",
+    parser.add_argument("--model_name", type=str, default="ConvAE",
                         help="the name of the model to be saved or loaded")
     #######################################################################################
 
