@@ -26,7 +26,7 @@ def plot_grad_flow(named_parameters):
     plt.title("Gradient flow")
     plt.grid(True)
 
-def plot_imgs(images, outputs):                
+def plot_imgs(images, outputs, block=False):                
     to_pil = transforms.ToPILImage()
     orig_img = np.array(to_pil(images.squeeze(0)))
     recon_img = np.array(to_pil(outputs.squeeze(0)))        
@@ -38,6 +38,10 @@ def plot_imgs(images, outputs):
     axes[1].axis("off")
     axes[1].set_title("Reconstructed")
     plt.tight_layout()
-    plt.show(block=False)
-    plt.pause(3)
-    plt.close()
+    
+    if(block): 
+        plt.show()
+    else:
+        plt.show(block=False)
+        plt.pause(5)
+        plt.close()

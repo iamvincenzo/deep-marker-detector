@@ -136,10 +136,6 @@ def get_mean_std(dataloader):
 
     return mean, std
 
-""" Helper function used to select the model to train. """
-def model_selection(args, input_size, num_classes):
-    pass
-
 """ Main function used to run the experiment. """
 def main(args):
     # tensorboard specifications
@@ -172,6 +168,11 @@ def main(args):
                              shuffle=True, num_workers=args.workers, pin_memory=pin) 
     validloader = DataLoader(valid_dataset, batch_size=1,
                              shuffle=True, num_workers=args.workers, pin_memory=pin)
+    
+    # plot an image with the corresponding mask
+    img, mask = next(iter(validloader))
+    from plotting_utils import plot_imgs
+    plot_imgs(img[0], mask[0], block=True)
 
     # # cuDNN supports many algorithms to compute convolution:
     # # autotuner runs a short benchmark and selects the algorithm with the best performance
@@ -185,9 +186,10 @@ def main(args):
     inputs, _ = next(iter(trainloader))
 
     # get the model
-    # model = ConvAutoencoder()
-    model = AutoEncoder(1, 2)
-    # model = model_selection(args=args, input_size=input_size, num_classes=num_classes)
+    if True:
+        model = ConvAutoencoder()
+    else:
+        model = AutoEncoder(1, 2)
 
     print("\nModel: ")
     pms.summary(model, torch.zeros(inputs.shape), max_depth=5, print_summary=True)
