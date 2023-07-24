@@ -1,5 +1,6 @@
 import os
 import torch
+import torchvision
 import numpy as np
 import torch.nn as nn
 from tqdm import tqdm
@@ -30,12 +31,16 @@ class Solver(object):
         self.device = device
         self.start_epoch = 0
         self.mean, self.std = normalize
+        self.step = 0
 
         self.model = model.to(device)
-       
-        # self.criterion = nn.BCEWithLogitsLoss()
-        # self.criterion = dc_loss
-        self.criterion = jac_loss
+
+        if args.loss == "bcewll":
+            self.criterion = nn.BCEWithLogitsLoss()
+        elif args.loss == "dc_loss":
+            self.criterion = dc_loss
+        elif args.loss == "jac_loss":
+            self.criterion = jac_loss
 
         if self.args.opt == "SGD":
             self.optimizer = optim.SGD(self.model.parameters(), lr=self.args.lr, 
@@ -151,6 +156,9 @@ class Solver(object):
             # print some statistics
             print(f"\nEpoch[{epoch + 1}/{self.num_epochs}] | train-loss: {train_loss:.4f}, "
                   f"validation-loss: {valid_loss:.4f} | lr: {lr_train}")
+            
+            self.writer.add_scalar("training-loss", train_loss, epoch * len(self.train_loader) + batch)
+            self.writer.add_scalar("validation-loss", valid_loss, epoch * len(self.valid_loader) + batch)
 
             # clear lists to track next epoch
             train_losses = []
@@ -201,7 +209,18 @@ class Solver(object):
 
                 valid_losses.append(loss.item())
 
-                plot_imgs(images[0], outputs[0])
+                if self.std != None:
+                    plot_imgs(self.inverse_normalize(images[0]), outputs[0])
+                else:
+                    plot_imgs(images[0], outputs[0])
+
+                img_grid_fake = torchvision.utils.make_grid(images[:16], normalize=True)
+                img_grid_real = torchvision.utils.make_grid(outputs[:16], normalize=True)
+
+                self.writer.add_image("Images", img_grid_fake, global_step=self.step)
+                self.writer.add_image("Prediction mask", img_grid_real, global_step=self.step)
+
+                self.step += 1
                 
         # reput model into training mode
         self.model.train()

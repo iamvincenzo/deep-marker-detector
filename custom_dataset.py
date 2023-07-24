@@ -37,7 +37,7 @@ def get_dataset(dataset_path, random_seed):
     return img_files_train, mask_files_train, img_files_valid, mask_files_valid
 
 """ Custom class used to create the training and test sets. """
-class CustomDataset(Dataset):
+class DeepMarkerDataset(Dataset):
     """ Initialize configurations. """
     def __init__(self, image_paths, target_paths, args, normalize=None, train=True):
         self.image_paths = image_paths
@@ -60,11 +60,11 @@ class CustomDataset(Dataset):
             if random.random() > 0.3:
                 image = TF.vflip(image)
                 mask = TF.vflip(mask)
-            # # random rotation
-            # if random.random() > 0.4:
-            #     angle = random.randint(-30, 30)
-            #     image = TF.rotate(image, angle)
-            #     mask = TF.rotate(mask, angle)
+            # random rotation
+            if random.random() > 0.4:
+                angle = random.randint(-30, 30)
+                image = TF.rotate(image, angle)
+                mask = TF.rotate(mask, angle)
 
         # to tensor and remove the alpha channel if present (PNG format)
         trnsf = transforms.Compose([transforms.ToTensor(),

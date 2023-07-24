@@ -10,11 +10,12 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 from torch.utils.tensorboard import SummaryWriter
 
+from models import UNET
 from solver import Solver
 from models import AutoEncoder
 from models import ConvAutoencoder
 from custom_dataset import get_dataset
-from custom_dataset import CustomDataset
+from custom_dataset import DeepMarkerDataset
 
 
 """ Helper function used to get cmd parameters. """
@@ -33,7 +34,7 @@ def get_args():
     # model-types
     #######################################################################################
     parser.add_argument("--select_model", type=str, default="ConvAutoEncoder",
-                        choices=["UNet", "YOLO", "ConvAutoEncoder"], help="select the model to train")
+                        choices=["UNet", "YOLO", "ConvAutoEncoder", "AE"], help="select the model to train")
 
     parser.add_argument("--pretrained", action="store_true",
                         help="indicates whether to load a pretrained model")
@@ -149,15 +150,15 @@ def main(args):
     
     if args.norm_input:
         # compute mean and std of unormalized data
-        dataset = CustomDataset(img_files_train, args, normalize=None, train=True)
+        dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=None, train=True)
         dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
         mean, std = get_mean_std(dataloader)
         normalize = transforms.Normalize(mean=mean, std=std)
     else:
         normalize, mean, std = None, None, None
 
-    train_dataset = CustomDataset(img_files_train, mask_files_train, args, normalize=normalize, train=True)
-    valid_dataset = CustomDataset(img_files_valid, mask_files_valid, args, normalize=normalize, train=False)
+    train_dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=normalize, train=True)
+    valid_dataset = DeepMarkerDataset(img_files_valid, mask_files_valid, args, normalize=normalize, train=False)
 
     # pin_memory: speed up the host (cpu) to device (gpu) transfer
     pin = True if torch.cuda.is_available() else False
@@ -166,13 +167,13 @@ def main(args):
     # according to a specific batch-size (load the data in memory)
     trainloader = DataLoader(train_dataset, batch_size=args.batch_size, 
                              shuffle=True, num_workers=args.workers, pin_memory=pin) 
-    validloader = DataLoader(valid_dataset, batch_size=1,
+    validloader = DataLoader(valid_dataset, batch_size=args.batch_size,
                              shuffle=True, num_workers=args.workers, pin_memory=pin)
     
     # plot an image with the corresponding mask
     img, mask = next(iter(validloader))
     from plotting_utils import plot_imgs
-    plot_imgs(img[0], mask[0], block=True)
+    plot_imgs(img[0], mask[0], block=False)
 
     # # cuDNN supports many algorithms to compute convolution:
     # # autotuner runs a short benchmark and selects the algorithm with the best performance
@@ -186,10 +187,12 @@ def main(args):
     inputs, _ = next(iter(trainloader))
 
     # get the model
-    if True:
+    if args.select_model == "ConvAutoEncoder":
         model = ConvAutoencoder()
-    else:
+    elif args.select_model == "AE":
         model = AutoEncoder(1, 2)
+    elif args.select_model == "UNet":
+        model = UNET(args, in_channels=1, out_channels=1)
 
     print("\nModel: ")
     pms.summary(model, torch.zeros(inputs.shape), max_depth=5, print_summary=True)
