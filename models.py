@@ -247,4 +247,3 @@ class ConvAutoencoder(torch.nn.Module):
         x = self.decoder(x)
 
         return x
-
