@@ -14,6 +14,7 @@ from models import UNET
 from solver import Solver
 from models import AutoEncoder
 from models import ConvAutoencoder
+from plotting_utils import plot_imgs
 from custom_dataset import get_dataset
 from custom_dataset import DeepMarkerDataset
 
