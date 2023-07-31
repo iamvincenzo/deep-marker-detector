@@ -26,7 +26,7 @@ def plot_grad_flow(named_parameters):
     plt.title("Gradient flow")
     plt.grid(True)
 
-def plot_imgs(images, outputs, block=False):                
+def plot_imgs(images, outputs, block=False):        
     to_pil = transforms.ToPILImage()
     orig_img = np.array(to_pil(images.squeeze(0)))
     recon_img = np.array(to_pil(outputs.squeeze(0)))        
