@@ -66,11 +66,11 @@ class DeepMarkerDataset(Dataset):
                 image = TF.rotate(image, angle)
                 mask = TF.rotate(mask, angle)
 
-        # to tensor and remove the alpha channel if present (PNG format)
-        trnsf = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Lambda(lambda x: x[:3])])
-        image = trnsf(image)
-        mask = trnsf(mask)
+        transform = transforms.Compose([transforms.Grayscale(),
+                                        transforms.ToTensor()])
+
+        image = transform(image)
+        mask = transform(mask)
 
         # input normalization if required
         if self.normalize is not None:
