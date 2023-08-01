@@ -78,8 +78,8 @@ def get_args():
     parser.add_argument("--lr", type=float, default=0.001,
                         help="the learning rate for optimization")
 
-    parser.add_argument("--loss", type=str, default="mse",
-                        choices=["mse", "bcewll", "jac_loss", "dc_loss"],
+    parser.add_argument("--loss", type=str, default="jac_loss",
+                        choices=["bcewll", "jac_loss", "dc_loss"],
                         help="the loss function used for model optimization")
 
     parser.add_argument("--opt", type=str, default="Adam", 
@@ -166,13 +166,13 @@ def main(args):
 
     # DataLoader wraps an iterable around the Dataset to enable easy access to the samples
     # according to a specific batch-size (load the data in memory)
-    trainloader = DataLoader(train_dataset, batch_size=args.batch_size, 
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, 
                              shuffle=True, num_workers=args.workers, pin_memory=pin) 
-    validloader = DataLoader(valid_dataset, batch_size=args.batch_size,
+    valid_loader = DataLoader(valid_dataset, batch_size=args.batch_size,
                              shuffle=True, num_workers=args.workers, pin_memory=pin)
     
     # plot an image with the corresponding mask
-    img, mask = next(iter(validloader))
+    img, mask = next(iter(valid_loader))
     from plotting_utils import plot_imgs
     plot_imgs(img[0], mask[0], block=False)
 
@@ -185,7 +185,7 @@ def main(args):
     print("\nDevice: ", device)
 
     # get input shape
-    inputs, _ = next(iter(trainloader))
+    inputs, _ = next(iter(train_loader))
 
     # get the model
     if args.select_model == "ConvAutoEncoder":
@@ -202,7 +202,7 @@ def main(args):
     args.patience = int(0.1 * args.num_epochs)
 
     # define solver class instance
-    solver = Solver(train_loader=trainloader, valid_loader=validloader, 
+    solver = Solver(train_loader=train_loader, valid_loader=valid_loader, 
                     model=model, device=device, writer=writer, 
                     normalize=(mean, std), args=args)
     
