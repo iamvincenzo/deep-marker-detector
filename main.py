@@ -198,9 +198,6 @@ def main(args):
     print("\nModel: ")
     pms.summary(model, torch.zeros(inputs.shape), max_depth=5, print_summary=True)
 
-    # early-stopping-patience: 10% of total epochs
-    args.patience = int(0.1 * args.num_epochs)
-
     # define solver class instance
     solver = Solver(train_loader=train_loader, valid_loader=valid_loader, 
                     model=model, device=device, writer=writer, 

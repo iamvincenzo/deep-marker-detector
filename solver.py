@@ -6,15 +6,14 @@ import torch.nn as nn
 from tqdm import tqdm
 import torch.optim as optim
 import matplotlib.pyplot as plt
-from torch.optim.lr_scheduler import StepLR
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+# from torch.optim.lr_scheduler import StepLR
+# from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from metrics import dc_loss
 from metrics import jac_loss
 from plotting_utils import plot_imgs
 from pytorchtools import EarlyStopping
 from plotting_utils import plot_grad_flow
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 
 """ Solver for training, validation and testing. """
@@ -49,10 +48,10 @@ class Solver(object):
             self.optimizer = optim.Adam(self.model.parameters(),
                                         lr=self.args.lr, betas=(0.9, 0.999))
         
-        # modify the learning rate during the training process
-        self.scheduler = ReduceLROnPlateau(self.optimizer, mode="min",
-                                           factor=0.1, patience=5, verbose=True)
-        # self.scheduler = StepLR(self.optimizer, step_size=100, gamma=0.1)
+        # # modify the learning rate during the training process
+        # self.scheduler = ReduceLROnPlateau(self.optimizer, mode="min",
+        #                                    factor=0.1, patience=5, verbose=True)
+        # # self.scheduler = StepLR(self.optimizer, step_size=100, gamma=0.1)
         
         if self.args.load_model:
             self.load_model()
@@ -63,7 +62,7 @@ class Solver(object):
         checkpoint = torch.load(check_path, map_location=torch.device(self.device))
         self.model.load_state_dict(checkpoint["model_state_dict"])
         self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        # self.scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         self.start_epoch = checkpoint["epoch"]
         
         print("\nModel loaded...")
@@ -139,16 +138,16 @@ class Solver(object):
             avg_train_losses.append(train_loss)
             avg_valid_losses.append(valid_loss)
 
-            # update the scheduler with the metric
-            self.scheduler.step(valid_loss)            
-            lr_train = self.optimizer.state_dict()['param_groups'][0]['lr']
+            # # update the scheduler with the metric
+            # self.scheduler.step(valid_loss)            
+            # lr_train = self.optimizer.state_dict()['param_groups'][0]['lr']
             # # update the learning rate scheduler
             # self.scheduler.step()
             # lr_train = self.scheduler.get_last_lr()
             
             # print some statistics
             print(f"\nEpoch[{epoch + 1}/{self.num_epochs}] | train-loss: {train_loss:.4f}, "
-                  f"validation-loss: {valid_loss:.4f} | lr: {lr_train}")
+                  f"validation-loss: {valid_loss:.4f} ") # | lr: {lr_train}")
             
             self.writer.add_scalar("training-loss", train_loss, epoch * len(self.train_loader) + batch)
             self.writer.add_scalar("validation-loss", valid_loss, epoch * len(self.valid_loader) + batch)
@@ -159,7 +158,7 @@ class Solver(object):
 
             # early_stopping needs the validation loss to check if it has decresed,
             # and if it has, it will make a checkpoint of the current model
-            early_stopping(epoch, self.model, self.optimizer, self.scheduler, valid_loss)
+            early_stopping(epoch, self.model, self.optimizer, valid_loss)
 
             if early_stopping.early_stop:
                 print("\nEarly stopping...")
