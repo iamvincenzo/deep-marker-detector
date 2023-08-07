@@ -60,7 +60,7 @@ def get_args():
 
     # training-parameters (1)
     #######################################################################################
-    parser.add_argument("--num_epochs", type=int, default=300,
+    parser.add_argument("--num_epochs", type=int, default=100,
                         help="the total number of training epochs")
 
     parser.add_argument("--batch_size", type=int, default=16,
@@ -101,7 +101,7 @@ def get_args():
 
     # data-path
     #######################################################################################
-    parser.add_argument("--dataset_path", type=str, default="./data",
+    parser.add_argument("--dataset_path", type=str, default="./data/1920x1080",
                         help="path where to save/get the dataset")
     #######################################################################################
 
@@ -157,6 +157,8 @@ def main(args):
         normalize = transforms.Normalize(mean=mean, std=std)
     else:
         normalize, mean, std = None, None, None
+    
+    # normalize = transforms.Normalize(mean=[0.5,], std=[0.5,])
 
     train_dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=normalize, train=True)
     valid_dataset = DeepMarkerDataset(img_files_valid, mask_files_valid, args, normalize=normalize, train=False)

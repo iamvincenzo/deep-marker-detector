@@ -189,7 +189,8 @@ class AutoEncoder(nn.Module):
             nn.ConvTranspose2d(in_channels=2 * 8 * hidden_dim, out_channels=8 * hidden_dim, kernel_size=2, stride=2),
             nn.BatchNorm2d(8 * hidden_dim),
             nn.ReLU(),
-            nn.ConvTranspose2d(in_channels=8 * hidden_dim, out_channels=1, kernel_size=2, stride=2)
+            nn.ConvTranspose2d(in_channels=8 * hidden_dim, out_channels=1, kernel_size=2, stride=2),
+            torch.nn.Sigmoid()
         )
 
     def initialize_weights(self):
