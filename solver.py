@@ -218,15 +218,12 @@ class Solver(object):
     def train_model_1(self):
         print("\nStarting training 1...")
 
-        self.criterion = nn.BCEWithLogitsLoss()
+        self.criterion = jac_loss
 
         train_losses = []
         valid_losses = []
         avg_train_losses = []
         avg_valid_losses = []
-
-        # # define the figure where to plot grads info
-        # grads_fig = plt.figure(figsize=(12, 6))
 
         # initialize the early_stopping object
         check_path = os.path.join(self.args.checkpoint_path, self.model_name)
@@ -278,17 +275,10 @@ class Solver(object):
             valid_loss = np.average(valid_losses)
             avg_train_losses.append(train_loss)
             avg_valid_losses.append(valid_loss)
-
-            # update the scheduler with the metric
-            self.scheduler.step(valid_loss)            
-            lr_train = self.optimizer.state_dict()['param_groups'][0]['lr']
-            # # update the learning rate scheduler
-            # self.scheduler.step()
-            # lr_train = self.scheduler.get_last_lr()
             
             # print some statistics
             print(f"\nEpoch[{epoch + 1}/{self.num_epochs}] | train-loss: {train_loss:.4f}, "
-                f"validation-loss: {valid_loss:.4f} | lr: {lr_train}")
+                  f"validation-loss: {valid_loss:.4f}")
             
             self.writer.add_scalar("training-loss", train_loss, epoch * len(self.train_loader) + batch_id)
             self.writer.add_scalar("validation-loss", valid_loss, epoch * len(self.valid_loader) + batch_id)
@@ -299,7 +289,7 @@ class Solver(object):
 
             # early_stopping needs the validation loss to check if it has decresed,
             # and if it has, it will make a checkpoint of the current model
-            early_stopping(epoch, self.model, self.optimizer, self.scheduler, valid_loss)
+            early_stopping(epoch, self.model, self.optimizer, valid_loss)
 
             if early_stopping.early_stop:
                 print("\nEarly stopping...")
@@ -311,10 +301,6 @@ class Solver(object):
         self.writer.flush()
         # free up system resources used by the writer
         self.writer.close() 
-        
-        # # show grad flow
-        # plt.tight_layout()
-        # plt.show()  
 
     """ Method used to evaluate the model on the validation/test set. """
     def validate_model_1(self, epoch, valid_losses):
@@ -336,6 +322,14 @@ class Solver(object):
                 
                     # forward pass: compute predicted outputs by passing inputs to the model
                     outputs = self.model(images)
+
+                    img_grid_fake = torchvision.utils.make_grid(images[:16], normalize=True)
+                    img_grid_real = torchvision.utils.make_grid(outputs[:16], normalize=True)
+
+                    self.writer.add_image("Images", img_grid_fake, global_step=self.step)
+                    self.writer.add_image("Prediction mask", img_grid_real, global_step=self.step)
+
+                    self.step += 1
                     
                     # calculate losses
                     loss += self.criterion(outputs, mask)
@@ -343,19 +337,6 @@ class Solver(object):
                 loss /= len(batch_samples)
                 
                 valid_losses.append(loss.item())
-
-                # if self.std != None:
-                #     plot_imgs(self.inverse_normalize(images[0]), outputs[0])
-                # else:
-                #     plot_imgs(images[0], outputs[0])
-
-                # img_grid_fake = torchvision.utils.make_grid(images[:16], normalize=True)
-                # img_grid_real = torchvision.utils.make_grid(outputs[:16], normalize=True)
-
-                # self.writer.add_image("Images", img_grid_fake, global_step=self.step)
-                # self.writer.add_image("Prediction mask", img_grid_real, global_step=self.step)
-
-                # self.step += 1
                 
         # reput model into training mode
         self.model.train()

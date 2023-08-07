@@ -14,7 +14,6 @@ from models import UNET
 from solver import Solver
 from models import AutoEncoder
 from models import ConvAutoencoder
-from plotting_utils import plot_imgs
 from custom_dataset import get_dataset
 from custom_dataset import DeepMarkerDataset
 
@@ -160,6 +159,8 @@ def main(args):
         normalize = transforms.Normalize(mean=mean, std=std)
     else:
         normalize, mean, std = None, None, None
+
+    normalize = transforms.Normalize(mean=[0.5,], std=[0.5,])
 
     train_dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=normalize, train=True)
     valid_dataset = DeepMarkerDataset(img_files_valid, mask_files_valid, args, normalize=normalize, train=False)
