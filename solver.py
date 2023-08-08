@@ -248,7 +248,7 @@ class Solver(object):
                 
                 for images, mask in batch_samples:
                     # put data on correct device
-                    images, mask = images.to(self.device), mask.to(self.device)
+                    images, mask = images.unsqueeze(0).to(self.device), mask.unsqueeze(0).to(self.device)
                                  
                     # forward pass: compute predicted outputs by passing inputs to the model
                     outputs = self.model(images)
@@ -318,7 +318,7 @@ class Solver(object):
 
                 for images, mask in batch_samples:
                     # put data on correct device
-                    images, mask = images.to(self.device), mask.to(self.device)            
+                    images, mask = images.unsqueeze(0).to(self.device), mask.unsqueeze(0).to(self.device)            
                 
                     # forward pass: compute predicted outputs by passing inputs to the model
                     outputs = self.model(images)
