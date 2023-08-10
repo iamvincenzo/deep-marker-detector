@@ -1,8 +1,8 @@
 # Deep Marker Detector
 A PyTorch-based project aimed at extracting the center of circular or box markers. The main goal of this project is to develop a Deep Learning (DL) based system for extracting circular markers from two-dimensional images used for camera calibration. The images used for model training come in two types, varying based on the resolution-objective parameters:
 
-- 1920×1080 pinhole (refer to Figure 1);
-- 3840×1920 fisheye (refer to Figure 2).
+- 1920×1080 pinhole.
+- 3840×1920 fisheye.
 
 The project consists of the following Python modules:
 
