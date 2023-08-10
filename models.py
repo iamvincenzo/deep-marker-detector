@@ -24,7 +24,7 @@ class AutoEncoder(nn.Module):
             nn.BatchNorm2d(8 * hidden_dim),
             nn.ReLU(),
             nn.ConvTranspose2d(in_channels=8 * hidden_dim, out_channels=1, kernel_size=2, stride=2),
-            torch.nn.Sigmoid()
+            torch.nn.Sigmoid() # comment if use BCEWithLogitsLoss
         )
 
     def forward(self, x):
@@ -57,7 +57,7 @@ class ConvAutoencoder(torch.nn.Module):
             torch.nn.ReLU(),
             torch.nn.Upsample(scale_factor=1, mode="nearest"),
             torch.nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=2),
-            torch.nn.Sigmoid()
+            torch.nn.Sigmoid() # comment if use BCEWithLogitsLoss
         )
 
     def forward(self, x):
