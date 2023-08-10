@@ -9,7 +9,7 @@ The project consists of the following Python modules:
 - `main.py` and `main_collate.py`: These modules are responsible for launching the simulation. They use other modules, including:
   (i) Modules for handling training/validation data.
   (ii) Modules for training and validation.
-  The file `main_collate.py` is used to train the model using images with different resolution (1920×1080 and 3840×1080).
+  The file main_collate.py is used to train the model using images with different resolution (1920×1080 and 3840×1080).
 
 - `custom_dataset.py`: This module is responsible for generating dataloaders for training and validation.
 
