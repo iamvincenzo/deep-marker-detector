@@ -22,11 +22,14 @@ The project consists of the following Python modules:
 
 - `pytorchtools.py`: This module includes an early stopping mechanism implementation.
 
-The **results** are contained within the `visione_artificiale_veicolo_report.pdf` file.
+The **results** are contained within the `results/visione_artificiale_veicolo_report.pdf` file.
 
 ## Some results:
 
-![plot1](./results/)
+![plot1](./results/img-caeup-jac-qual-res.png)
+![plot2](./results/msk-caeup-jac-qual-res.png)
+![plot3](./results/bs8_autoenc_jacLoss_mix1920x1080_norm_transf_1.png)
+![plot4](./results/bs8_autoenc_jacLoss_mix1920x1080_norm_transf_2.png)
 
 ## The parameters that can be provided through the command line and allow customization of the execution are:
 
