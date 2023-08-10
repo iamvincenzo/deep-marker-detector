@@ -214,7 +214,7 @@ class Solver(object):
         # reput model into training mode
         self.model.train()
 
-    """ Method used to train the model with an early-stopping implementation. """
+    """ Method used to train the model using images with different resolutions. """
     def train_model_1(self):
         print("\nStarting training 1...")
 
@@ -302,7 +302,8 @@ class Solver(object):
         # free up system resources used by the writer
         self.writer.close() 
 
-    """ Method used to evaluate the model on the validation/test set. """
+    """ Method used to evaluate the model on the validation/test set using 
+        images with different resolutions. """
     def validate_model_1(self, epoch, valid_losses):
         print(f"\nEvaluation iteration | Epoch [{epoch + 1}/{self.num_epochs}]")
         
