@@ -13,7 +13,7 @@ from metrics import dc_loss
 from metrics import jac_loss
 from plotting_utils import plot_imgs
 from pytorchtools import EarlyStopping
-from plotting_utils import plot_grad_flow
+# from plotting_utils import plot_grad_flow
 
 
 """ Solver for training, validation and testing. """

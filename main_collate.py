@@ -34,27 +34,7 @@ def get_args():
     # model-types
     #######################################################################################
     parser.add_argument("--select_model", type=str, default="ConvAutoEncoder",
-                        choices=["UNet", "YOLO", "ConvAutoEncoder", "AE"], help="select the model to train")
-
-    parser.add_argument("--pretrained", action="store_true",
-                        help="indicates whether to load a pretrained model")
-
-    parser.add_argument("--freeze", action="store_true",
-                        help="indicates whether to freeze a pretrained model")
-    #######################################################################################
-
-    # network-architecture-parameters
-    #######################################################################################
-    # num of filters in each convolutional layer (num of channels of the feature-map): 
-    # so you can modify the network architecture
-    parser.add_argument('--features', nargs='+',  default=[64, 128, 256, 512],
-                        help='a list of feature values (number of filters i.e., neurons in each layer)')
-    
-    parser.add_argument("--use_batch_norm", action="store_true",
-                        help="indicates whether to use batch normalization layers in each conv layer")
-
-    parser.add_argument("--weights_init", action="store_true",
-                        help="determines whether to use weights initialization")
+                        choices=["ConvAutoEncoder", "AE"], help="select the model to train")
     #######################################################################################
 
     # training-parameters (1)
@@ -151,15 +131,16 @@ def main(args):
      img_files_valid, mask_files_valid) = get_dataset(dataset_path=args.dataset_path,
                                                       random_seed=args.random_seed)
     
-    if args.norm_input:
-        # compute mean and std of unormalized data
-        dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=None, train=True)
-        dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
-        mean, std = get_mean_std(dataloader)
-        normalize = transforms.Normalize(mean=mean, std=std)
-    else:
-        normalize, mean, std = None, None, None
+    # if args.norm_input:
+    #     # compute mean and std of unormalized data
+    #     dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=None, train=True)
+    #     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
+    #     mean, std = get_mean_std(dataloader)
+    #     normalize = transforms.Normalize(mean=mean, std=std)
+    # else:
+    #     normalize, mean, std = None, None, None
 
+    mean, std = 0.5, 0.5
     normalize = transforms.Normalize(mean=[0.5,], std=[0.5,])
 
     train_dataset = DeepMarkerDataset(img_files_train, mask_files_train, args, normalize=normalize, train=True)
@@ -191,8 +172,6 @@ def main(args):
         model = ConvAutoencoder()
     elif args.select_model == "AE":
         model = AutoEncoder(1, 2)
-    elif args.select_model == "UNet":
-        model = UNET(args, in_channels=1, out_channels=1)
 
     # define solver class instance
     solver = Solver(train_loader=train_loader, valid_loader=valid_loader, 
